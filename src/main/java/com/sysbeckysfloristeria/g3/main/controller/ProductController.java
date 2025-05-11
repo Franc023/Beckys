@@ -1,7 +1,7 @@
 package com.sysbeckysfloristeria.g3.main.controller;
 
 import com.sysbeckysfloristeria.g3.main.model.Product;
-import com.sysbeckysfloristeria.g3.main.modelDTO.ProductDTO;
+import com.sysbeckysfloristeria.g3.main.modelDTO.ProductDto;
 import com.sysbeckysfloristeria.g3.main.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,33 +18,35 @@ public class ProductController {
     private IProductService service;
 
     @GetMapping("/allproduct")
-    public List<ProductDTO> getAllProduct(){
+    public List<ProductDto> getAllProduct(){
         return service.getAllProduct();
     }
 
     @PostMapping("/saveproduct")
-    public Product saveProduct(@RequestBody Product product){
-        return service.saveProduct(product);
+    public String saveProduct(@RequestBody Product product){
+        service.saveProduct(product);
+        return "product saved";
     }
 
     @PutMapping("/editproducts")
-    public Product editProduct(@RequestBody Product product){
-        return service.editProduct(product);
+    public String editProduct(@RequestBody Product product){
+        service.editProduct(product);
+        return "product edited";
     }
 
     @GetMapping("/idproduct/{id}")
-    public Optional<Product> findById(@PathVariable Long id){
+    public Optional<ProductDto> findById(@PathVariable Long id){
         return service.findById(id);
     }
 
     @PostMapping("/nameproduct")
-    public List<ProductDTO> findByName(@RequestBody Map<String,String> request){
+    public List<ProductDto> findByName(@RequestBody Map<String,String> request){
         String name = request.get("name");
         return service.findByName(name);
     }
 
     @PostMapping("/descriptionproduct")
-    public List<ProductDTO> findByDescription(@RequestBody Map<String, String>request){
+    public List<ProductDto> findByDescription(@RequestBody Map<String, String>request){
         String description= request.get("description");
         return service.findByDescription(description);
     }

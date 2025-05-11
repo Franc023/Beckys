@@ -1,8 +1,9 @@
-package com.sysbeckysfloristeria.g3.main.service;
+package com.sysbeckysfloristeria.g3.main.service.impl;
 
 import com.sysbeckysfloristeria.g3.main.model.Product;
-import com.sysbeckysfloristeria.g3.main.modelDTO.ProductDTO;
+import com.sysbeckysfloristeria.g3.main.modelDTO.ProductDto;
 import com.sysbeckysfloristeria.g3.main.repository.IProductRepository;
+import com.sysbeckysfloristeria.g3.main.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,45 +12,45 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class ProductService implements IProductService{
+public class ProductService implements IProductService {
 
     @Autowired
     private IProductRepository productRepository;
 
-    private ProductDTO convertToDto(Product product){
-        return new ProductDTO(product.getName(),product.getDescription()
+    private ProductDto convertToDto(Product product){
+        return new ProductDto(product.getName(),product.getDescription()
                 ,product.getPrice(),product.getStock(),product.getCategory(),product.getDateExpiration());
     }
 
     @Override
-    public List<ProductDTO> getAllProduct() {
-        var products= productRepository.findAll();
+    public List<ProductDto> getAllProduct() {
+        List<Product> products= productRepository.findAll();
         return products.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     @Override
-    public Product saveProduct(Product product) {
-        return productRepository.save(product);
+    public void saveProduct(Product product) {
+         productRepository.save(product);
     }
 
     @Override
-    public Product editProduct(Product product) {
-        return this.saveProduct(product);
+    public void editProduct(Product product) {
+        this.saveProduct(product);
     }
 
     @Override
-    public Optional<Product> findById(Long id) {
-        return productRepository.findById(id);
+    public Optional<ProductDto> findById(Long id) {
+        return productRepository.findById(id).map(this::convertToDto) ;
     }
 
     @Override
-    public List<ProductDTO> findByName(String name) {
+    public List<ProductDto> findByName(String name) {
         var products = productRepository.findByNameContaining(name);
         return products.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<ProductDTO> findByDescription(String description) {
+    public List<ProductDto> findByDescription(String description) {
         var products = productRepository.findByDescriptionContaining(description);
         return products.stream().map(this::convertToDto).collect(Collectors.toList());
     }

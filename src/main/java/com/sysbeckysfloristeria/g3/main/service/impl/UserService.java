@@ -1,8 +1,9 @@
-package com.sysbeckysfloristeria.g3.main.service;
+package com.sysbeckysfloristeria.g3.main.service.impl;
 
 import com.sysbeckysfloristeria.g3.main.model.User;
-import com.sysbeckysfloristeria.g3.main.modelDTO.UserDTO;
+import com.sysbeckysfloristeria.g3.main.modelDTO.UserDto;
 import com.sysbeckysfloristeria.g3.main.repository.IUserRepository;
+import com.sysbeckysfloristeria.g3.main.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,31 +29,31 @@ public class UserService implements IUserService, UserDetailsService {
     private PasswordEncoder passwordEncoder;
 
     //converts the user entity to userDTO
-    private UserDTO convertToDTO(User user){
-        return new UserDTO(user.getName(),user.getLastName(),user.getEmail(),user.getPhone());
+    private UserDto convertToDTO(User user){
+        return new UserDto(user.getName(),user.getLastName(),user.getEmail(),user.getPhone());
     }
 
     @Override
-    public List<UserDTO> getAllUser() {
+    public List<UserDto> getAllUser() {
         List<User> users= userRepository.findAll();
         return users.stream()
                 .map(this::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
-    public User saveUser(User user) {
+    public void saveUser(User user) {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     @Override
-    public User editUser(User user) {
+    public void editUser(User user) {
         if(user.getPassword()!=null && !user.getPassword().isEmpty()){
             String encodedPassword = passwordEncoder.encode(user.getPassword());
             user.setPassword(encodedPassword);
         }
-        return this.saveUser(user);
+        this.saveUser(user);
     }
 
     @Override
@@ -61,7 +62,7 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public List<UserDTO> dinByWord(String word) {
+    public List<UserDto> dinByWord(String word) {
         List<User> users= userRepository.findByNameContaining(word);
         return users.stream()
                 .map(this::convertToDTO).collect(Collectors.toList());

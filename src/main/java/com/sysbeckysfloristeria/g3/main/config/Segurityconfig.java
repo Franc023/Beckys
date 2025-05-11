@@ -1,6 +1,6 @@
 package com.sysbeckysfloristeria.g3.main.config;
 
-import com.sysbeckysfloristeria.g3.main.service.UserService;
+import com.sysbeckysfloristeria.g3.main.service.impl.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,7 +29,7 @@ public class Segurityconfig {
                         .requestMatchers("/admin/**").hasRole("Admin")
                         .requestMatchers("/user/**").hasAnyRole("User","Admin")
                         .anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults());
         return http.build();
     }
 

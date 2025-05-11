@@ -1,7 +1,7 @@
 package com.sysbeckysfloristeria.g3.main.controller;
 
 import com.sysbeckysfloristeria.g3.main.model.User;
-import com.sysbeckysfloristeria.g3.main.modelDTO.UserDTO;
+import com.sysbeckysfloristeria.g3.main.modelDTO.UserDto;
 import com.sysbeckysfloristeria.g3.main.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,18 +17,20 @@ public class UserController {
     private IUserService service;
 
     @GetMapping("/alluser")
-    public List<UserDTO> getAllUser(){
+    public List<UserDto> getAllUser(){
         return service.getAllUser();
     }
 
     @PostMapping("/saveuser")
-    public User saveUser(@RequestBody User user){
-        return service.saveUser(user);
+    public String saveUser(@RequestBody User user){
+        service.saveUser(user);
+        return "User saved";
     }
 
     @PutMapping("/edituser")
-    public User editUser(@RequestBody User user){
-        return service.editUser(user);
+    public String editUser(@RequestBody User user){
+        service.editUser(user);
+        return "user edited";
     }
 
     @GetMapping("/iduser/{id}")
@@ -37,7 +39,7 @@ public class UserController {
     }
 
     @PostMapping("/worduser")
-    public List<UserDTO> findByWord(@RequestBody Map<String, String> request){
+    public List<UserDto> findByWord(@RequestBody Map<String, String> request){
         String word= request.get("word");
         return service.dinByWord(word);
     }
