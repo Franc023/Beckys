@@ -1,9 +1,9 @@
 package com.sysbeckysfloristeria.g3.main.repository;
 
-import com.sysbeckysfloristeria.g3.main.model.Cart;
+import com.sysbeckysfloristeria.g3.main.model.Pay;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ICartRepository extends JpaRepository<Cart,Long> {
+public interface IPayrepository extends JpaRepository<Pay,Long> {
 }

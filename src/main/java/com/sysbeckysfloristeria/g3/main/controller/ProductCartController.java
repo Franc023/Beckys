@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/productCart")
@@ -23,5 +24,16 @@ public class ProductCartController {
     public String saveProductCart(@RequestBody ProductCart productCart){
         servicePCart.saveProductCart(productCart);
         return "saved product";
+    }
+
+    @GetMapping("/findByIdProductCart/{id}")
+    public Optional<ProductCartDto> findByIdProductCart(@PathVariable Long id){
+        return servicePCart.findByIdProductCart(id);
+    }
+
+    @DeleteMapping("/deletByIdProductCart/{id}")
+    public String deletByIdProducCart(@PathVariable  Long id){
+        servicePCart.deletByIdProductCart(id);
+        return "Deleted productCart ";
     }
 }
