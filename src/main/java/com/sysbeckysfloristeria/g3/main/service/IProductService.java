@@ -13,5 +13,7 @@ public interface IProductService{
     Optional<ProductDto> findById(Long id);
     List<ProductDto> findByName(String name);
     List<ProductDto> findByDescription(String description);
+    List<ProductDto> findBySeason(String season);
+    List<ProductDto> search(String word);
     String deletById(Long id);
 }
