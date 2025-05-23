@@ -18,10 +18,12 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+    private String imgUrl;
     private String name;
+    private String season;
     private String description;
-    private double price;
+    private Double price;
     private int stock;
     private String category;
-    private Date dateExpiration;
+    private Date dateAdded;
 }

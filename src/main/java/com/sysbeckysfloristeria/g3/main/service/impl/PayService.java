@@ -1,5 +1,6 @@
 package com.sysbeckysfloristeria.g3.main.service.impl;
 
+import com.sysbeckysfloristeria.g3.main.exception.ResourceNotFoundException;
 import com.sysbeckysfloristeria.g3.main.model.Pay;
 import com.sysbeckysfloristeria.g3.main.modelDTO.PayDto;
 import com.sysbeckysfloristeria.g3.main.repository.IPayrepository;
@@ -33,11 +34,17 @@ public class PayService implements IPayService {
 
     @Override
     public void editPay(Pay pay) {
+        if(!payrepository.existsById(pay.getId())){
+            throw new ResourceNotFoundException("Pago con id "+ pay.getId() +" No existe para editar");
+        }
         this.savePay(pay);
     }
 
     @Override
     public void deletPay(Long id) {
+        if(!payrepository.existsById(id)){
+            throw new ResourceNotFoundException("Pago con id "+ id + "no existe para elimianr");
+        }
         payrepository.deleteById(id);
     }
 }

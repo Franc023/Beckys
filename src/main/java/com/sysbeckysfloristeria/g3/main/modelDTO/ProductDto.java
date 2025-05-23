@@ -10,10 +10,12 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDto {
+    private String imgUrl;
     private String name;
+    private String season;
     private String description;
-    private double price;
+    private Double price;
     private int stock;
     private String Category;
-    private Date dateExpiration;
+    private Date dateAdded;
 }

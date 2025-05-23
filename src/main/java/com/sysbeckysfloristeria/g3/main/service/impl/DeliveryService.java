@@ -1,5 +1,6 @@
 package com.sysbeckysfloristeria.g3.main.service.impl;
 
+import com.sysbeckysfloristeria.g3.main.exception.ResourceNotFoundException;
 import com.sysbeckysfloristeria.g3.main.model.Delivery;
 import com.sysbeckysfloristeria.g3.main.modelDTO.DeliveryDto;
 import com.sysbeckysfloristeria.g3.main.repository.IDeliveryRepository;
@@ -33,11 +34,17 @@ public class DeliveryService implements IDeliveryService {
 
     @Override
     public void editDelivery(Delivery delivery) {
+        if (!deliveryRepository.existsById(delivery.getId())) {
+            throw new ResourceNotFoundException("Entrega con ID " + delivery.getId() + " no existe para editar.");
+        }
         this.saveDelivery(delivery);
     }
 
     @Override
     public void deletDelivery(Long id) {
+        if (!deliveryRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Entrega con ID " + id + " no existe para eliminar.");
+        }
         deliveryRepository.deleteById(id);
     }
 }

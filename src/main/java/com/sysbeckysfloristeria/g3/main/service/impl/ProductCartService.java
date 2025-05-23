@@ -1,6 +1,6 @@
 package com.sysbeckysfloristeria.g3.main.service.impl;
 
-import com.sysbeckysfloristeria.g3.main.model.Product;
+import com.sysbeckysfloristeria.g3.main.exception.ResourceNotFoundException;
 import com.sysbeckysfloristeria.g3.main.model.ProductCart;
 import com.sysbeckysfloristeria.g3.main.modelDTO.ProductCartDto;
 import com.sysbeckysfloristeria.g3.main.repository.IProductCartRepository;
@@ -42,11 +42,16 @@ public class ProductCartService implements IProductCartService {
 
     @Override
     public Optional<ProductCartDto> findByIdProductCart(Long id) {
-        return repository.findById(id).map(this::convertToDto);
+        ProductCart productCart = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Producto del carrito con ID " + id + " no encontrado"));
+        return Optional.of(convertToDto(productCart));
     }
 
     @Override
     public String deletByIdProductCart(Long id) {
+        if(!repository.existsById(id)){
+            throw new ResourceNotFoundException("No se pudo eliminar, producto del carrito con ID "+id+" No encontrado.");
+        }
         repository.deleteById(id);
         return "El producto del carrito se elimino correctamente";
     }

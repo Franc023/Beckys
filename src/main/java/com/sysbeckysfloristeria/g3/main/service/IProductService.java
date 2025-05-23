@@ -16,4 +16,7 @@ public interface IProductService{
     List<ProductDto> findBySeason(String season);
     List<ProductDto> search(String word);
     String deletById(Long id);
+    List<ProductDto> getProductsByDateAdded();
+    List<ProductDto> getProductsSortedByNameAsc();
+    List<ProductDto> getProductsSortedByNameDesc();
 }

@@ -1,5 +1,6 @@
 package com.sysbeckysfloristeria.g3.main.service.impl;
 
+import com.sysbeckysfloristeria.g3.main.exception.ResourceNotFoundException;
 import com.sysbeckysfloristeria.g3.main.model.User;
 import com.sysbeckysfloristeria.g3.main.modelDTO.UserDto;
 import com.sysbeckysfloristeria.g3.main.repository.IUserRepository;
@@ -42,6 +43,11 @@ public class UserService implements IUserService, UserDetailsService {
 
     @Override
     public void saveUser(User user) {
+        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+        if (existingUser.isPresent()) {
+            throw new IllegalArgumentException("El email ya está registrado.");
+        }
+
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         userRepository.save(user);
@@ -49,7 +55,11 @@ public class UserService implements IUserService, UserDetailsService {
 
     @Override
     public void editUser(User user) {
-        if(user.getPassword()!=null && !user.getPassword().isEmpty()){
+        if (!userRepository.existsById(user.getId())) {
+            throw new ResourceNotFoundException("Usuario con ID " + user.getId() + " no existe para editar.");
+        }
+
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
             String encodedPassword = passwordEncoder.encode(user.getPassword());
             user.setPassword(encodedPassword);
         }
@@ -58,27 +68,35 @@ public class UserService implements IUserService, UserDetailsService {
 
     @Override
     public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new ResourceNotFoundException("Usuario con ID " + id + " no encontrado.");
+        }
+        return user;
     }
 
     @Override
     public List<UserDto> dinByWord(String word) {
-        List<User> users= userRepository.findByNameContaining(word);
-        return users.stream()
-                .map(this::convertToDTO).collect(Collectors.toList());
+        List<User> users = userRepository.findByNameContaining(word);
+        if (users.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron usuarios con el nombre que contiene: " + word);
+        }
+        return users.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
     public String deletById(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Usuario con ID " + id + " no existe para eliminar.");
+        }
         userRepository.deleteById(id);
-        return "Usuario eliminado con exito";
+        return "Usuario eliminado con éxito";
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
         User user = userRepository.findByName(username)
-                .orElseThrow(()->new UsernameNotFoundException("usr not found " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con nombre: " + username));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getName(),

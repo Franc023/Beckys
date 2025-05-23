@@ -1,5 +1,6 @@
 package com.sysbeckysfloristeria.g3.main.service.impl;
 
+import com.sysbeckysfloristeria.g3.main.exception.ResourceNotFoundException;
 import com.sysbeckysfloristeria.g3.main.model.Cart;
 import com.sysbeckysfloristeria.g3.main.model.ProductCart;
 import com.sysbeckysfloristeria.g3.main.modelDTO.CartDto;
@@ -39,16 +40,24 @@ public class CartService implements ICartService {
 
     @Override
     public void editCart(Cart cart) {
-        this.cartRepository.save(cart);
+        if (!cartRepository.existsById(cart.getId())) {
+            throw new ResourceNotFoundException("Carrito con ID " + cart.getId() + " no existe para editar.");
+        }
+        this.saveCart(cart);
     }
 
     @Override
     public Optional<CartDto> findByIdcart(Long id) {
-        return cartRepository.findById(id).stream().map(this::convertToDto).findFirst();
+        Cart cart = cartRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Carrito con ID " + id + " no encontrado."));
+        return Optional.of(convertToDto(cart));
     }
 
     @Override
     public void deletCartById(Long id) {
+        if (!cartRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Carrito con ID " + id + " no existe para eliminar.");
+        }
         cartRepository.deleteById(id);
     }
 }

@@ -11,4 +11,7 @@ public interface IProductRepository extends JpaRepository<Product,Long> {
     List<Product> findByNameContainingIgnoreCase(String name);
     List<Product> findByDescriptionContainingIgnoreCase(String description);
     List<Product> findBySeasonContainingIgnoreCase(String season);
+    List<Product> findAllByOrderByDateAddedAsc();
+    List<Product> findAllByOrderByNameAsc();
+    List<Product> findAllByOrderByNameDesc();
 }
