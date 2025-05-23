@@ -1,8 +1,13 @@
 package com.sysbeckysfloristeria.g3.main.service.impl;
 
 import com.sysbeckysfloristeria.g3.main.exception.ResourceNotFoundException;
+import com.sysbeckysfloristeria.g3.main.model.ProductCart;
 import com.sysbeckysfloristeria.g3.main.model.User;
+import com.sysbeckysfloristeria.g3.main.modelDTO.CartDto;
+import com.sysbeckysfloristeria.g3.main.modelDTO.PayDto;
 import com.sysbeckysfloristeria.g3.main.modelDTO.UserDto;
+import com.sysbeckysfloristeria.g3.main.modelDTO.UserFullInfoDto;
+import com.sysbeckysfloristeria.g3.main.repository.IPayrepository;
 import com.sysbeckysfloristeria.g3.main.repository.IUserRepository;
 import com.sysbeckysfloristeria.g3.main.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +33,9 @@ public class UserService implements IUserService, UserDetailsService {
     //Dependency injection PasswordEncoder
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private IPayrepository payrepository;
 
     //converts the user entity to userDTO
     private UserDto convertToDTO(User user){
@@ -91,6 +99,43 @@ public class UserService implements IUserService, UserDetailsService {
         }
         userRepository.deleteById(id);
         return "Usuario eliminado con éxito";
+    }
+
+    public List<UserFullInfoDto> getAllUsersWithDetails() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> {
+                    // Convertir List<Cart> a List<CartDto>
+                    List<CartDto> cartDtos = user.getCart().stream().map(cart -> {
+                        List<Long> productCartIds = cart.getProductCartList().stream()
+                                .map(ProductCart::getId)
+                                .collect(Collectors.toList());
+                        return new CartDto(
+                                cart.getId(),
+                                cart.getUser() != null ? cart.getUser().getId() : null,
+                                productCartIds,
+                                cart.getCreationDate()
+                        );
+                    }).collect(Collectors.toList());
+
+                    // Convertir List<Pay> a List<PayDto>
+                    List<PayDto> payDtos = payrepository.findByUser(user).stream().map(pay -> new PayDto(
+                            pay.getId(),
+                            pay.getUser() != null ? pay.getUser().getId() : null,
+                            pay.getCart().getId(),
+                            pay.getTypePayment(),
+                            pay.getFechaPago()
+                    )).collect(Collectors.toList());
+
+                    // Crear el DTO final
+                    return new UserFullInfoDto(
+                            user.getName(),
+                            user.getEmail(),
+                            cartDtos,
+                            payDtos
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
