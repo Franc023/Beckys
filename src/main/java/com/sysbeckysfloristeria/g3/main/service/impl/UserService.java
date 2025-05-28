@@ -2,11 +2,9 @@ package com.sysbeckysfloristeria.g3.main.service.impl;
 
 import com.sysbeckysfloristeria.g3.main.exception.ResourceNotFoundException;
 import com.sysbeckysfloristeria.g3.main.model.ProductCart;
+import com.sysbeckysfloristeria.g3.main.model.Role;
 import com.sysbeckysfloristeria.g3.main.model.User;
-import com.sysbeckysfloristeria.g3.main.modelDTO.CartDto;
-import com.sysbeckysfloristeria.g3.main.modelDTO.PayDto;
-import com.sysbeckysfloristeria.g3.main.modelDTO.UserDto;
-import com.sysbeckysfloristeria.g3.main.modelDTO.UserFullInfoDto;
+import com.sysbeckysfloristeria.g3.main.modelDTO.*;
 import com.sysbeckysfloristeria.g3.main.repository.IPayrepository;
 import com.sysbeckysfloristeria.g3.main.repository.IUserRepository;
 import com.sysbeckysfloristeria.g3.main.service.IUserService;
@@ -42,6 +40,7 @@ public class UserService implements IUserService, UserDetailsService {
         return new UserDto(user.getName(),user.getLastName(),user.getEmail(),user.getPhone());
     }
 
+
     @Override
     public List<UserDto> getAllUser() {
         List<User> users= userRepository.findAll();
@@ -50,28 +49,43 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public void saveUser(User user) {
-        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+    public void saveUser(UserSaveDto userDto) {
+        Optional<User> existingUser = userRepository.findByEmail(userDto.getEmail());
         if (existingUser.isPresent()) {
             throw new IllegalArgumentException("El email ya está registrado.");
         }
 
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
+
+        User user = new User();
+        user.setName(userDto.getName());
+        user.setLastName(userDto.getLastName());
+        user.setEmail(userDto.getEmail());
+        user.setPhone(userDto.getNumber());
+        if (userDto.getRole() == null) {
+            user.setRol(Role.User);
+        } else {
+            user.setRol(userDto.getRole());
+        }
         user.setPassword(encodedPassword);
+
         userRepository.save(user);
     }
 
     @Override
-    public void editUser(User user) {
-        if (!userRepository.existsById(user.getId())) {
-            throw new ResourceNotFoundException("Usuario con ID " + user.getId() + " no existe para editar.");
+    public void editUser(UserEditDto userDto) {
+        Optional<User> optionalUser = userRepository.findById(userDto.getId());
+        if (optionalUser.isEmpty()) {
+            throw new ResourceNotFoundException("Usuario con ID " + userDto.getId() + " no existe.");
         }
 
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            String encodedPassword = passwordEncoder.encode(user.getPassword());
-            user.setPassword(encodedPassword);
-        }
-        this.saveUser(user);
+        User user = optionalUser.get();
+        user.setName(userDto.getName());
+        user.setLastName(userDto.getLastName());
+        user.setEmail(userDto.getEmail());
+        user.setPhone(userDto.getNumber());
+
+        userRepository.save(user);
     }
 
     @Override

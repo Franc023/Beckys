@@ -3,6 +3,8 @@ package com.sysbeckysfloristeria.g3.main.controller;
 import com.sysbeckysfloristeria.g3.main.exception.ResourceNotFoundException;
 import com.sysbeckysfloristeria.g3.main.model.User;
 import com.sysbeckysfloristeria.g3.main.modelDTO.UserDto;
+import com.sysbeckysfloristeria.g3.main.modelDTO.UserEditDto;
+import com.sysbeckysfloristeria.g3.main.modelDTO.UserSaveDto;
 import com.sysbeckysfloristeria.g3.main.service.IUserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +28,9 @@ public class UserController {
     }
 
     @PostMapping("/saveuser")
-    public ResponseEntity<String> saveUser(@Valid @RequestBody User user) {
+    public ResponseEntity<String> saveUser(@Valid @RequestBody UserSaveDto userSaveDto) {
         try {
-            service.saveUser(user);
+            service.saveUser(userSaveDto);
             return ResponseEntity.status(HttpStatus.CREATED).body("Usuario guardado con éxito");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
@@ -36,8 +38,8 @@ public class UserController {
     }
 
     @PutMapping("/edituser")
-    public String editUser(@RequestBody User user){
-        service.editUser(user);
+    public String editUser(@RequestBody UserEditDto userEditDto){
+        service.editUser(userEditDto);
         return "user edited";
     }
 

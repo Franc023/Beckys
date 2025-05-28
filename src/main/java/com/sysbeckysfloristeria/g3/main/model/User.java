@@ -25,4 +25,7 @@ public class User {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<Cart> cart;
     private String password;
+
+    public User(String name, String lastName, String email, int number, Role role, String password) {
+    }
 }

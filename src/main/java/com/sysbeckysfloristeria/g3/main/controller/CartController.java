@@ -52,7 +52,7 @@ public class CartController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    @DeleteMapping("/deletCart/{if}")
+    @DeleteMapping("/deletCart/{id}")
     public ResponseEntity<String> deleteCart(@PathVariable Long id) {
         try {
             cartService.deletCartById(id);
