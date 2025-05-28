@@ -10,57 +10,42 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/Cart")
+@RequestMapping("/cart")
 public class CartController {
     @Autowired
     private CartService cartService;
 
-    @GetMapping("/getCart")
-    public List<CartDto> getCart (){
-        return cartService.getAllCart();
+    @GetMapping
+    public ResponseEntity<List<CartDto>> getAllCarts() {
+        return ResponseEntity.ok(cartService.getAllCart());
     }
 
-    @PostMapping("/saveCart")
+    @PostMapping
     public ResponseEntity<String> saveCart(@Valid @RequestBody Cart cart) {
-        try {
-            cartService.saveCart(cart);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Carrito guardado con éxito");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al guardar el carrito: " + e.getMessage());
-        }
+        cartService.saveCart(cart);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Carrito creado exitosamente");
     }
 
-    @PutMapping("/editCart")
-    public ResponseEntity<String> editCart(@Valid @RequestBody Cart cart) {
-        try {
-            cartService.editCart(cart);
-            return ResponseEntity.ok("Carrito editado con éxito");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al editar el carrito: " + e.getMessage());
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> editCart(@PathVariable Long id, @Valid @RequestBody Cart cart) {
+        cart.setId(id);
+        cartService.editCart(cart);
+        return ResponseEntity.ok("Carrito actualizado exitosamente");
     }
 
-    @GetMapping("/findByIdCart/{id}")
-    public ResponseEntity<CartDto> findByIdCart(@PathVariable Long id) {
-        Optional<CartDto> cartDto = cartService.findByIdcart(id);
-        return cartDto.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    @GetMapping("/{id}")
+    public ResponseEntity<CartDto> findCartById(@PathVariable Long id) {
+        return cartService.findByIdcart(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/deletCart/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCart(@PathVariable Long id) {
-        try {
-            cartService.deletCartById(id);
-            return ResponseEntity.ok("Carrito eliminado correctamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al eliminar el carrito: " + e.getMessage());
-        }
+        cartService.deletCartById(id);
+        return ResponseEntity.ok("Carrito eliminado exitosamente");
     }
-
 }

@@ -19,30 +19,48 @@ import java.util.List;
 @EnableWebSecurity
 public class Segurityconfig {
 
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth ->auth
-                        .requestMatchers("/login","/user/v1/saveuser","/register.html","crearProducto.html","/product/v1/saveproduct").permitAll()
-                        .requestMatchers("/admin/**").hasRole("Admin")
-                        .requestMatchers("/user/**").hasAnyRole("User","Admin")
-                        .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults());
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                // Endpoints públicos (sin autenticación)
+                .requestMatchers(
+                    "/login"
+                ).permitAll()
+                
+                // Endpoints solo para admin
+                .requestMatchers("/admin/**").hasRole("Admin")
+                .requestMatchers("/user/v1/**").hasRole("Admin")
+                .requestMatchers("/register.html").hasRole("Admin")
+                
+                // Endpoints para admin y user
+                .requestMatchers(
+                    "/product/v1/**",
+                    "/cart/**",
+                    "/productCart/**",
+                    "/pay/**",
+                    "/delivery/**"
+                ).hasAnyRole("Admin", "User")
+                
+                // Cualquier otra ruta requiere autenticación
+                .anyRequest().authenticated()
+            )
+            .httpBasic(Customizer.withDefaults());
+        
         return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder){
-        DaoAuthenticationProvider authProvider= new DaoAuthenticationProvider();
+    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder);
         return new ProviderManager(List.of(authProvider));
     }
 
     @Bean
-    public  UserDetailsService userDetailsService(UserService userService){
+    public UserDetailsService userDetailsService(UserService userService) {
         return userService;
     }
 }

@@ -15,44 +15,30 @@ import java.util.List;
 @RequestMapping("/delivery")
 public class DeliveryController {
     @Autowired
-    private DeliveryService deliveryServicer;
+    private DeliveryService deliveryService;
 
-    @GetMapping("/allDelivery")
-    public List<DeliveryDto> AllDelivery(){
-        return deliveryServicer.getAllDelivery();
+    @GetMapping
+    public ResponseEntity<List<DeliveryDto>> getAllDeliveries() {
+        return ResponseEntity.ok(deliveryService.getAllDelivery());
     }
 
-    @PostMapping("/saveDelivery")
+    @PostMapping
     public ResponseEntity<String> saveDelivery(@Valid @RequestBody Delivery delivery) {
-        try {
-            deliveryServicer.saveDelivery(delivery);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Entrega guardada correctamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al guardar la entrega: " + e.getMessage());
-        }
+        deliveryService.saveDelivery(delivery);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Entrega registrada exitosamente");
     }
 
-    @PutMapping("/editDelivery")
-    public ResponseEntity<String> editDelivery(@Valid @RequestBody Delivery delivery) {
-        try {
-            deliveryServicer.editDelivery(delivery);
-            return ResponseEntity.ok("Entrega editada correctamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al editar la entrega: " + e.getMessage());
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> editDelivery(@PathVariable Long id, @Valid @RequestBody Delivery delivery) {
+        delivery.setId(id);
+        deliveryService.editDelivery(delivery);
+        return ResponseEntity.ok("Entrega actualizada exitosamente");
     }
 
-    @DeleteMapping("/deletDelivery/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDelivery(@PathVariable Long id) {
-        try {
-            deliveryServicer.deletDelivery(id);
-            return ResponseEntity.ok("Entrega eliminada correctamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al eliminar la entrega: " + e.getMessage());
-        }
+        deliveryService.deletDelivery(id);
+        return ResponseEntity.ok("Entrega eliminada exitosamente");
     }
-
 }

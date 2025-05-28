@@ -1,6 +1,8 @@
 package com.sysbeckysfloristeria.g3.main.service.impl;
 
+import com.sysbeckysfloristeria.g3.main.exception.BadRequestException;
 import com.sysbeckysfloristeria.g3.main.exception.ResourceNotFoundException;
+import com.sysbeckysfloristeria.g3.main.exception.UnauthorizedException;
 import com.sysbeckysfloristeria.g3.main.model.ProductCart;
 import com.sysbeckysfloristeria.g3.main.model.Role;
 import com.sysbeckysfloristeria.g3.main.model.User;
@@ -37,23 +39,34 @@ public class UserService implements IUserService, UserDetailsService {
 
     //converts the user entity to userDTO
     private UserDto convertToDTO(User user){
+        if (user == null) {
+            throw new BadRequestException("No se puede convertir un usuario nulo a DTO");
+        }
         return new UserDto(user.getName(),user.getLastName(),user.getEmail(),user.getPhone());
     }
 
 
     @Override
     public List<UserDto> getAllUser() {
-        List<User> users= userRepository.findAll();
+        List<User> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron usuarios registrados");
+        }
         return users.stream()
-                .map(this::convertToDTO).collect(Collectors.toList());
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
     public void saveUser(UserSaveDto userDto) {
-        Optional<User> existingUser = userRepository.findByEmail(userDto.getEmail());
-        if (existingUser.isPresent()) {
-            throw new IllegalArgumentException("El email ya está registrado.");
+        if (userDto == null) {
+            throw new BadRequestException("Los datos del usuario no pueden ser nulos");
         }
+
+        userRepository.findByEmail(userDto.getEmail())
+                .ifPresent(user -> {
+                    throw new BadRequestException("El email " + userDto.getEmail() + " ya está registrado");
+                });
 
         String encodedPassword = passwordEncoder.encode(userDto.getPassword());
 
@@ -62,11 +75,7 @@ public class UserService implements IUserService, UserDetailsService {
         user.setLastName(userDto.getLastName());
         user.setEmail(userDto.getEmail());
         user.setPhone(userDto.getNumber());
-        if (userDto.getRole() == null) {
-            user.setRol(Role.User);
-        } else {
-            user.setRol(userDto.getRole());
-        }
+        user.setRol(userDto.getRole() != null ? userDto.getRole() : Role.User);
         user.setPassword(encodedPassword);
 
         userRepository.save(user);
@@ -90,11 +99,11 @@ public class UserService implements IUserService, UserDetailsService {
 
     @Override
     public Optional<User> findById(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new ResourceNotFoundException("Usuario con ID " + id + " no encontrado.");
+        if (id == null) {
+            throw new BadRequestException("El ID no puede ser nulo");
         }
-        return user;
+        return Optional.ofNullable(userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario con ID " + id + " no encontrado")));
     }
 
     @Override
@@ -153,14 +162,14 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByName(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con nombre: " + username));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("Usuario no encontrado con email: " + email));
 
         return new org.springframework.security.core.userdetails.User(
-                user.getName(),
+                user.getEmail(),
                 user.getPassword(),
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRol().name()))
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRol().name()))
         );
     }
 }

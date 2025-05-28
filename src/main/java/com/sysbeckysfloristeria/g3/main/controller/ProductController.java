@@ -1,10 +1,12 @@
 package com.sysbeckysfloristeria.g3.main.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sysbeckysfloristeria.g3.main.exception.BadRequestException;
 import com.sysbeckysfloristeria.g3.main.model.Product;
 import com.sysbeckysfloristeria.g3.main.modelDTO.ProductDto;
 import com.sysbeckysfloristeria.g3.main.service.IProductService;
 import com.sysbeckysfloristeria.g3.main.service.impl.FileStorageService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,17 +36,25 @@ public class ProductController {
             @RequestPart("product") String productJson,
             @RequestPart("image") MultipartFile imageFile) {
 
+        if (imageFile == null || imageFile.isEmpty()) {
+            throw new BadRequestException("La imagen del producto es requerida");
+        }
+
+        if (productJson == null || productJson.isEmpty()) {
+            throw new BadRequestException("Los datos del producto son requeridos");
+        }
+
         try {
-            // Convertir el JSON manualmente a un objeto Product
             ObjectMapper objectMapper = new ObjectMapper();
             Product product = objectMapper.readValue(productJson, Product.class);
 
-            String imageUrl = fileStorageService.storeImage(imageFile); // lógica que veremos abajo
+            String imageUrl = fileStorageService.storeImage(imageFile);
             product.setImgUrl(imageUrl);
             service.saveProduct(product);
-            return ResponseEntity.ok("Producto guardado correctamente con imagen.");
+            
+            return ResponseEntity.ok("Producto guardado correctamente con imagen");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al guardar el producto: " + e.getMessage());
+            throw new BadRequestException("Error al procesar los datos del producto: " + e.getMessage());
         }
     }
 
@@ -54,21 +64,33 @@ public class ProductController {
         return ResponseEntity.ok("Producto editado correctamente.");
     }
 
-    @GetMapping("/idproduct/{id}")
+    @GetMapping("/findbyid/{id}")
     public ResponseEntity<ProductDto> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.findById(id).orElseThrow(() -> new RuntimeException("Producto no encontrado")));
+        return ResponseEntity.ok(service.findById(id).orElseThrow());
     }
 
-    @PostMapping("/nameproduct")
-    public ResponseEntity<List<ProductDto>> findByName(@RequestBody Map<String, String> request) {
-        String name = request.get("name");
+    @GetMapping("/findbyname")
+    public ResponseEntity<List<ProductDto>> findByName(@RequestParam String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new BadRequestException("El nombre de búsqueda no puede estar vacío");
+        }
         return ResponseEntity.ok(service.findByName(name));
     }
 
-    @PostMapping("/descriptionproduct")
-    public ResponseEntity<List<ProductDto>> findByDescription(@RequestBody Map<String, String> request) {
-        String description = request.get("description");
+    @GetMapping("/findbydescription")
+    public ResponseEntity<List<ProductDto>> findByDescription(@RequestParam String description) {
+        if (description == null || description.trim().isEmpty()) {
+            throw new BadRequestException("La descripción de búsqueda no puede estar vacía");
+        }
         return ResponseEntity.ok(service.findByDescription(description));
+    }
+
+    @GetMapping("/findbyseason")
+    public ResponseEntity<List<ProductDto>> findBySeason(@RequestParam String season) {
+        if (season == null || season.trim().isEmpty()) {
+            throw new BadRequestException("La temporada de búsqueda no puede estar vacía");
+        }
+        return ResponseEntity.ok(service.findBySeason(season));
     }
 
     @DeleteMapping("/deletid/{id}")

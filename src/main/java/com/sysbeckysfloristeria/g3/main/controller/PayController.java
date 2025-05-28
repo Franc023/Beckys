@@ -17,41 +17,28 @@ public class PayController {
     @Autowired
     private PayService payService;
 
-    @GetMapping("/allPay")
-    public List<PayDto> getAllPay(){
-        return payService.getAllPay();
+    @GetMapping
+    public ResponseEntity<List<PayDto>> getAllPayments() {
+        return ResponseEntity.ok(payService.getAllPay());
     }
 
-    @PostMapping("/savePay")
+    @PostMapping
     public ResponseEntity<String> savePay(@Valid @RequestBody Pay pay) {
-        try {
-            payService.savePay(pay);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Pago guardado correctamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al guardar el pago: " + e.getMessage());
-        }
+        payService.savePay(pay);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Pago registrado exitosamente");
     }
 
-    @PutMapping("/editPay")
-    public ResponseEntity<String> editPay(@Valid @RequestBody Pay pay) {
-        try {
-            payService.editPay(pay);
-            return ResponseEntity.ok("Pago editado correctamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al editar el pago: " + e.getMessage());
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> editPay(@PathVariable Long id, @Valid @RequestBody Pay pay) {
+        pay.setId(id);
+        payService.editPay(pay);
+        return ResponseEntity.ok("Pago actualizado exitosamente");
     }
 
-    @DeleteMapping("/deletePay/{id}")
-    public ResponseEntity<String> deletPay(@PathVariable Long id) {
-        try {
-            payService.deletPay(id);
-            return ResponseEntity.ok("Pago eliminado correctamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al eliminar el pago: " + e.getMessage());
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletePay(@PathVariable Long id) {
+        payService.deletPay(id);
+        return ResponseEntity.ok("Pago eliminado exitosamente");
     }
 }
