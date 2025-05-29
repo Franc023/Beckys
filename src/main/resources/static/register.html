@@ -3,117 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Usuario</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .register-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-        .register-container h2 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            text-align: center;
-        }
-        .register-container label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .register-container input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .register-container button {
-            width: 100%;
-            padding: 10px;
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .register-container button:hover {
-            background-color: #218838;
-        }
-    </style>
+    <title>Registro de Usuario - SysBeckys Floristería</title>
+    <link rel="stylesheet" href="register.css">
 </head>
 <body>
-<div class="register-container">
-    <h2>Registro de Usuario</h2>
-    <form id="registerForm">
-        <label for="name">Nombre:</label>
-        <input type="text" id="name" name="name" required>
+    <div class="register-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🌸 Registro de Usuario</h1>
+            <p>SysBeckys Floristería</p>
+        </div>
 
-        <label for="lastName">Apellido:</label>
-        <input type="text" id="lastName" name="lastName" required>
+        <!-- Messages -->
+        <div id="successMessage" class="success-message"></div>
+        <div id="errorMessage" class="error-message"></div>
 
-        <label for="email">Correo Electrónico:</label>
-        <input type="email" id="email" name="email" required>
+        <!-- Form -->
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="name">👤 Nombre:</label>
+                <input type="text" id="name" name="name" required placeholder="Ingresa tu nombre">
+            </div>
 
-        <label for="phone">Teléfono:</label>
-        <input type="number" id="phone" name="phone" required>
+            <div class="form-group">
+                <label for="lastName">👤 Apellido:</label>
+                <input type="text" id="lastName" name="lastName" required placeholder="Ingresa tu apellido">
+            </div>
 
-        <label for="rol">Rol:</label>
-        <select id="rol" name="rol" required>
-            <option value="User">Usuario</option>
-            <option value="Admin">Administrador</option>
-        </select>
+            <div class="form-group">
+                <label for="email">📧 Correo Electrónico:</label>
+                <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com">
+            </div>
 
-        <label for="password">Contraseña:</label>
-        <input type="password" id="password" name="password" required>
+            <div class="form-group">
+                <label for="phone">📱 Teléfono:</label>
+                <input type="tel" id="phone" name="phone" required placeholder="123-456-7890">
+            </div>
 
-        <button type="submit">Registrarse</button>
-    </form>
-</div>
+            <div class="form-group">
+                <label for="rol">🔑 Rol:</label>
+                <select id="rol" name="rol" required>
+                    <option value="">Selecciona un rol</option>
+                    <option value="User">👤 Usuario</option>
+                    <option value="Admin">👑 Administrador</option>
+                </select>
+            </div>
 
-<script>
-    document.getElementById('registerForm').addEventListener('submit', function (event) {
-        event.preventDefault(); // Evita que el formulario se envíe de la manera tradicional
+            <div class="form-group">
+                <label for="password">🔒 Contraseña:</label>
+                <input type="password" id="password" name="password" required placeholder="Mínimo 6 caracteres">
+            </div>
 
-        // Obtén los datos del formulario
-        const userData = {
-            name: document.getElementById('name').value,
-            lastName: document.getElementById('lastName').value,
-            email: document.getElementById('email').value,
-            phone: parseInt(document.getElementById('phone').value),
-            rol: document.getElementById('rol').value,
-            password: document.getElementById('password').value
-        };
+            <button type="submit" class="submit-btn" id="submitBtn">
+                Registrarse
+            </button>
+            
+            <div id="loading" class="loading">Registrando usuario...</div>
+        </form>
 
-        // Envía los datos al backend usando fetch
-        fetch('http://localhost:80/user/v1/saveuser', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(userData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert('Usuario registrado con éxito: ' + JSON.stringify(data));
-            // Puedes redirigir al usuario a otra página después del registro
-            // window.location.href = '/login.html';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Hubo un error al registrar el usuario.');
+        <!-- Back link -->
+        <div class="back-link">
+            <a href="dashboard.html">⬅️ Volver al Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Limpiar mensajes anteriores
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            // Mostrar loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Registrando...';
+            loading.style.display = 'block';
+
+            // Validar contraseña
+            const password = document.getElementById('password').value;
+            if (password.length < 6) {
+                showError('La contraseña debe tener al menos 6 caracteres');
+                resetButton();
+                return;
+            }
+
+            // Obtener datos del formulario
+            const userData = {
+                name: document.getElementById('name').value.trim(),
+                lastName: document.getElementById('lastName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                number: parseInt(document.getElementById('phone').value),
+                role: document.getElementById('rol').value,
+                password: password
+            };
+
+            // Validar campos
+            if (!userData.name || !userData.lastName || !userData.email || !userData.number || !userData.role) {
+                showError('Por favor completa todos los campos');
+                resetButton();
+                return;
+            }
+
+            // Enviar datos al backend
+            fetch('/user/saveuser', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text || 'Error en el servidor');
+                    });
+                }
+                return response.text();
+            })
+            .then(data => {
+                showSuccess('¡Usuario registrado exitosamente! 🎉');
+                document.getElementById('registerForm').reset();
+                
+                // Redirigir al dashboard después de 2 segundos
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError(error.message || 'Error al registrar el usuario. Intenta nuevamente.');
+            })
+            .finally(() => {
+                resetButton();
+            });
         });
-    });
-</script>
+
+        function showSuccess(message) {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        function resetButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Registrarse';
+            loading.style.display = 'none';
+        }
+
+        // Validación en tiempo real del email
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (email && !emailRegex.test(email)) {
+                this.style.borderColor = '#f44336';
+            } else {
+                this.style.borderColor = '#e0e0e0';
+            }
+        });
+
+        // Validación en tiempo real de la contraseña
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            
+            if (password.length > 0 && password.length < 6) {
+                this.style.borderColor = '#f44336';
+            } else {
+                this.style.borderColor = '#e0e0e0';
+            }
+        });
+    </script>
 </body>
 </html>

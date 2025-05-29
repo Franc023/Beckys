@@ -10,6 +10,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDto {
+    private Long id;
     private String imgUrl;
     private String name;
     private String season;

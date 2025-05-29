@@ -18,6 +18,7 @@ public class ProductService implements IProductService {
 
     private ProductDto convertToDto(Product product) {
         return new ProductDto(
+                product.getId(),
                 product.getImgUrl(),
                 product.getName(),
                 product.getSeason(),
