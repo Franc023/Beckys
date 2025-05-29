@@ -1,6 +1,6 @@
 package com.sysbeckysfloristeria.g3.main.controller;
 
-import com.sysbeckysfloristeria.g3.main.service.JwtService;
+import com.sysbeckysfloristeria.g3.main.service.impl.JwtService;
 import com.sysbeckysfloristeria.g3.main.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
