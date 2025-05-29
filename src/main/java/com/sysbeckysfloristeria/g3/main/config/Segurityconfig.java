@@ -26,13 +26,12 @@ public class Segurityconfig {
             .authorizeHttpRequests(auth -> auth
                 // Endpoints públicos (sin autenticación)
                 .requestMatchers(
-                    "/login"
+                    "/auth/login"
                 ).permitAll()
                 
                 // Endpoints solo para admin
                 .requestMatchers("/admin/**").hasRole("Admin")
                 .requestMatchers("/user/v1/**").hasRole("Admin")
-                .requestMatchers("/register.html").hasRole("Admin")
                 
                 // Endpoints para admin y user
                 .requestMatchers(

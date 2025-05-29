@@ -1,4 +1,4 @@
-package com.sysbeckysfloristeria.g3.main.service;
+package com.sysbeckysfloristeria.g3.main.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;

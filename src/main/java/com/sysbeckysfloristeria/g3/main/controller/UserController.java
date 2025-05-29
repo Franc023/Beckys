@@ -8,6 +8,7 @@ import com.sysbeckysfloristeria.g3.main.modelDTO.UserSaveDto;
 import com.sysbeckysfloristeria.g3.main.service.IUserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RequestMapping("/user")
 public class UserController {
     @Autowired
+    @Qualifier("userService")
     private IUserService service;
 
     @GetMapping("/alluser")
@@ -58,4 +60,5 @@ public class UserController {
     @DeleteMapping("/deletid/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Long id) {
         return ResponseEntity.ok(service.deletById(id));
-    }}
+    }
+}

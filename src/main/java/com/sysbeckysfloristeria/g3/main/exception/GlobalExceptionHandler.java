@@ -1,6 +1,6 @@
 package com.sysbeckysfloristeria.g3.main.exception;
 
-import com.sysbeckysfloristeria.g3.main.service.EmailService;
+import com.sysbeckysfloristeria.g3.main.service.impl.EmailService;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
