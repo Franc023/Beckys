@@ -1,0 +1,21 @@
+<div class="dashboard-container">
+  <h1>Bienvenido al Dashboard</h1>
+  <p>Este es tu panel donde puedes gestionar tu cuenta.</p>
+  <div class="dashboard-links">
+    <!-- Mostrar opciones según estado de autenticación -->
+    <ng-container *ngIf="!isLoggedIn()">
+      <!-- Para usuarios no autenticados -->
+      <a class="dashboard-link" routerLink="/register">Registrar Usuario</a>
+      <a class="dashboard-link" routerLink="/login">Iniciar Sesión</a>
+    </ng-container>
+    
+    <ng-container *ngIf="isLoggedIn()">
+      <!-- Para usuarios autenticados -->
+      <a class="dashboard-link" routerLink="/crear-producto">Crear Producto</a>
+      <a class="dashboard-link" (click)="logout()">Cerrar Sesión</a>
+    </ng-container>
+    
+    <!-- Disponible para todos -->
+    <a class="dashboard-link" routerLink="/productos">Ver Productos</a>
+  </div>
+</div>
