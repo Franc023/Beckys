@@ -18,6 +18,7 @@ public class ProductService implements IProductService {
 
     private ProductDto convertToDto(Product product) {
         return new ProductDto(
+                product.getId(),
                 product.getImgUrl(),
                 product.getName(),
                 product.getSeason(),
@@ -32,10 +33,10 @@ public class ProductService implements IProductService {
     @Override
     public List<ProductDto> getAllProduct() {
         var products = productRepository.findAll();
-        if (products.isEmpty()) {
-            throw new RuntimeException("No hay productos disponibles.");
-        }
-        return products.stream().map(this::convertToDto).collect(Collectors.toList());
+        // No lanzamos excepción aquí, devolvemos lista vacía si no hay productos
+        return products.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -47,11 +48,25 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public void editProduct(Product product) {
-        if (!productRepository.existsById(product.getId())) {
-            throw new RuntimeException("Producto no encontrado para editar.");
+    public void editProduct(ProductDto productDto) {
+        Product existingProduct = productRepository.findById(productDto.getId())
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado para editar."));
+
+        // Solo actualiza los campos que vienen en el DTO
+        existingProduct.setName(productDto.getName());
+        existingProduct.setSeason(productDto.getSeason());
+        existingProduct.setDescription(productDto.getDescription());
+        existingProduct.setPrice(productDto.getPrice());
+        existingProduct.setStock(productDto.getStock());
+        existingProduct.setCategory(productDto.getCategory());
+        existingProduct.setDateAdded(productDto.getDateAdded());
+
+        // Solo cambia la imagen si viene una nueva
+        if (productDto.getImgUrl() != null && !productDto.getImgUrl().isBlank()) {
+            existingProduct.setImgUrl(productDto.getImgUrl());
         }
-        saveProduct(product);
+
+        productRepository.save(existingProduct);
     }
 
     @Override

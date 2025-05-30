@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,11 @@ public class ProductController {
 
     @GetMapping("/allproduct")
     public ResponseEntity<List<ProductDto>> getAllProduct() {
-        return ResponseEntity.ok(service.getAllProduct());
+        List<ProductDto> products = service.getAllProduct();
+        if (products.isEmpty()) {
+            return ResponseEntity.noContent().build();  // HTTP 204 No Content
+        }
+        return ResponseEntity.ok(products);  // HTTP 200 OK
     }
 
     @PostMapping(value = "/saveproduct", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -58,9 +63,10 @@ public class ProductController {
         }
     }
 
-    @PutMapping("/editproducts")
-    public ResponseEntity<String> editProduct(@RequestBody Product product) {
-        service.editProduct(product);
+    @PutMapping("/editproducts/{id}")
+    public ResponseEntity<String> editProduct(@PathVariable Long id,@Valid @RequestBody ProductDto productDto) {
+        productDto.setId(id);
+        service.editProduct(productDto);
         return ResponseEntity.ok("Producto editado correctamente.");
     }
 
@@ -94,10 +100,12 @@ public class ProductController {
     }
 
     @DeleteMapping("/deletid/{id}")
-    public ResponseEntity<String> deletById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.deletById(id));
+    public ResponseEntity<Map<String, String>> deletById(@PathVariable Long id) {
+        String mensaje = service.deletById(id);
+        Map<String, String> response = new HashMap<>();
+        response.put("mensaje", mensaje);
+        return ResponseEntity.ok(response);
     }
-
     @PostMapping("/search")
     public ResponseEntity<List<ProductDto>> search(@RequestBody Map<String, String> request) {
         String word = request.get("word");

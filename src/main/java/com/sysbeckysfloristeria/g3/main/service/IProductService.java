@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface IProductService{
     List<ProductDto> getAllProduct();
     void saveProduct(Product product);
-    void editProduct(Product product);
+    void editProduct(ProductDto productDto);
     Optional<ProductDto> findById(Long id);
     List<ProductDto> findByName(String name);
     List<ProductDto> findByDescription(String description);
